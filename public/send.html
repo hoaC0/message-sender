@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nachricht senden</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Neue Nachricht senden</h1>
+    
+    <form id="messageForm">
+        <div class="form-group">
+            <label for="title">Titel:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="message">Nachricht:</label>
+            <textarea id="message" name="message" required></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit">Senden</button>
+        </div>
+    </form>
+    
+    <div id="statusMessage" class="status-message" style="display: none;"></div>
+    
+    <a href="/" class="nav-link">Zurück zu den Nachrichten</a>
+    
+    <script>
+        document.getElementById("messageForm").addEventListener("submit", function(event) {
+            // verhindert das neuladen von der seite
+            event.preventDefault();
+            
+            const titleString = document.getElementById('title').value;
+            const messageString = document.getElementById('message').value;
+            
+            // Statusnachricht zurücksetzen
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.style.display = 'none';
+            statusElement.className = 'status-message';
+
+            // sendet Nachrichten an den NODE Server
+            fetch('http://localhost:3000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: titleString,
+                    message: messageString
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Netzwerkantwort war nicht ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Erfolg:', data);
+                
+                // sucessful
+                statusElement.textContent = 'Nachricht erfolgreich gesendet!';
+                statusElement.classList.add('success');
+                statusElement.style.display = 'block';
+                
+                // formular reset
+                document.getElementById('messageForm').reset();
+                
+                // nach 3 sek zur nachrichten seite weiterleiten
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Fehler beim Senden der Nachricht:', error);
+                
+                // fehöer anzeigen
+                statusElement.textContent = 'Fehler beim Senden der Nachricht. Bitte versuche es erneut.';
+                statusElement.classList.add('error');
+                statusElement.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
