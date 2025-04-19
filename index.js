@@ -52,7 +52,7 @@ const server = http.createServer((req, res) => {
                     }
                 }
                 
-                // nachricht adden
+                // nachricht add
                 messages.push(message);
                 
                 // nachrichten in datei schreiben/spiechern
