@@ -116,7 +116,7 @@ const server = http.createServer((req, res) => {
             if (fileContent) {
                 messages = JSON.parse(fileContent);
                 
-                // 5 Tage in ms
+                // ms
                 const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
                 const now = Date.now();
                 
